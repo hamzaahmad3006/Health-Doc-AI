@@ -158,6 +158,13 @@ export const useOverview = () => {
 
   useEffect(() => {
     fetchData();
+
+    // Auto-refresh every 15 seconds to catch new uploads
+    const interval = setInterval(() => {
+      fetchData();
+    }, 15000);
+
+    return () => clearInterval(interval);
   }, [selectedPatientId]);
 
   const [searchQuery, setSearchQuery] = useState("");

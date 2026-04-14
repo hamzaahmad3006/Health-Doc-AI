@@ -1,5 +1,10 @@
 import os
+import sys
 import json
+
+# Add the project root to the path so 'from backend...' works locally
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(BASE_DIR))
 from sqlalchemy.orm import Session
 from backend.database import SessionLocal
 from backend.models import Document, Patient

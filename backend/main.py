@@ -1,6 +1,11 @@
-from dotenv import load_dotenv
 import os
+import sys
+from dotenv import load_dotenv
+
+# Add the project root to the path so 'from backend...' works locally
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(BASE_DIR))
+
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 from fastapi import FastAPI

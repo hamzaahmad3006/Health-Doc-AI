@@ -148,32 +148,35 @@ async def upload_and_process(file: UploadFile, db: Session, user_id: int):
             patient_age = data.get("patient_age")
             patient_gender = data.get("patient_gender")
 
-            if patient_name:
-                # Find or create patient
-                patient = db.query(Patient).filter(
-                    Patient.name.ilike(patient_name), 
-                    Patient.user_id == user_id
-                ).first()
+            # Fallback for missing name to ensure it shows in dashboard
+            if not patient_name:
+                patient_name = f"Unidentified Patient ({db_doc.filename[:15]})"
 
-                if not patient:
-                    patient = Patient(
-                        name=patient_name, 
-                        user_id=user_id,
-                        age=patient_age,
-                        gender=patient_gender
-                    )
-                    db.add(patient)
-                else:
-                    # Update age/gender if they are provided and current ones are missing
-                    if patient_age and not patient.age:
-                        patient.age = patient_age
-                    if patient_gender and not patient.gender:
-                        patient.gender = patient_gender
-                
-                db.commit()
-                db.refresh(patient)
-                
-                db_doc.patient_id = patient.id
+            # Find or create patient
+            patient = db.query(Patient).filter(
+                Patient.name.ilike(patient_name), 
+                Patient.user_id == user_id
+            ).first()
+
+            if not patient:
+                patient = Patient(
+                    name=patient_name, 
+                    user_id=user_id,
+                    age=patient_age,
+                    gender=patient_gender
+                )
+                db.add(patient)
+            else:
+                # Update age/gender if they are provided and current ones are missing
+                if patient_age and not patient.age:
+                    patient.age = patient_age
+                if patient_gender and not patient.gender:
+                    patient.gender = patient_gender
+            
+            db.commit()
+            db.refresh(patient)
+            
+            db_doc.patient_id = patient.id
         
         db.commit()
         db.refresh(db_doc)
