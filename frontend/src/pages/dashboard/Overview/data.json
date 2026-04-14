@@ -1,0 +1,51 @@
+[
+  {
+    "date": "2026-04-01",
+    "metrics": {
+      "Glucose": 110,
+      "Hemoglobin": 13.5
+    }
+  },
+  {
+    "date": "2026-04-02",
+    "metrics": {
+      "Glucose": 125,
+      "Hemoglobin": 13.8
+    }
+  },
+  {
+    "date": "2026-04-03",
+    "metrics": {
+      "Glucose": 115,
+      "Hemoglobin": 13.2
+    }
+  },
+  {
+    "date": "2026-04-04",
+    "metrics": {
+      "Glucose": 140,
+      "Hemoglobin": 14.1
+    }
+  },
+  {
+    "date": "2026-04-05",
+    "metrics": {
+      "Glucose": 130,
+      "Hemoglobin": 13.9
+    }
+  },
+  {
+    "date": "2026-04-06",
+    "metrics": {
+      "Glucose": 122,
+      "Hemoglobin": 13.6
+    }
+  },
+  {
+    "date": "2026-04-07",
+    "metrics": {
+      "Glucose": 131,
+      "Hemoglobin": 14.1
+    }
+  }
+]
