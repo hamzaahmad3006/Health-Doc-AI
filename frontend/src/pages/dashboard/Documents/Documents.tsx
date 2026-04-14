@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FileText,
@@ -24,6 +25,7 @@ const DocumentsPage: React.FC = () => {
     documents,
     isLoading,
     isUploading,
+    isProcessing,
     uploadProgress,
     handleUpload,
     handleMultiUpload,
@@ -472,235 +474,244 @@ const DocumentsPage: React.FC = () => {
         </motion.div>
       )}
 
-      {/* Details Modal */}
-      <AnimatePresence>
-        {selectedDoc && (
-          <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-10 md:pt-20 bg-slate-950/80 backdrop-blur-md">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="glass-card w-full max-w-2xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col"
-            >
-              <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
-                <div>
-                  <h2 className="text-2xl font-black text-white">
-                    Medical Analysis
-                  </h2>
-                  <p className="text-slate-400 text-sm mt-1">
-                    {selectedDoc.filename}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  {selectedDoc.isApproved && (
-                    <span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-xs font-bold uppercase tracking-wider rounded-lg border border-emerald-500/20">
-                      Doctor Approved
-                    </span>
-                  )}
-                  <button
-                    onClick={() => {
-                      setIsEditing(false);
-                      closeDetails();
-                    }}
-                    className="p-2 hover:bg-white/5 rounded-xl text-slate-500 hover:text-white transition-all"
-                  >
-                    <AlertCircle size={24} className="rotate-45" />
-                  </button>
-                </div>
-              </div>
-
-              <div className="p-6 space-y-6 overflow-y-auto flex-1 custom-scrollbar">
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-1">
-                    <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">
-                      Current Status
-                    </p>
-                    <p
-                      className={`text-lg font-black ${selectedDoc.status === "completed" ? "text-emerald-500" : selectedDoc.status === "error" ? "text-rose-500" : "text-blue-500"}`}
-                    >
-                      {selectedDoc.status.toUpperCase()}
+      {createPortal(
+        <AnimatePresence>
+          {selectedDoc && (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="glass-card w-full max-w-2xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col"
+              >
+                <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+                  <div>
+                    <h2 className="text-2xl font-black text-white">
+                      Medical Analysis
+                    </h2>
+                    <p className="text-slate-400 text-sm mt-1">
+                      {selectedDoc.filename}
                     </p>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">
-                      AI Accuracy Score
-                    </p>
-                    <p
-                      className={`text-lg font-black ${selectedDoc.status === "error" ? "text-rose-500" : "text-white"}`}
+                  <div className="flex items-center gap-4">
+                    {selectedDoc.isApproved && (
+                      <span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-xs font-bold uppercase tracking-wider rounded-lg border border-emerald-500/20">
+                        Doctor Approved
+                      </span>
+                    )}
+                    <button
+                      onClick={() => {
+                        setIsEditing(false);
+                        closeDetails();
+                      }}
+                      className="p-2 hover:bg-white/5 rounded-xl text-slate-500 hover:text-white transition-all"
                     >
-                      {(selectedDoc.confidence * 100).toFixed(1)}%
-                    </p>
+                      <AlertCircle size={24} className="rotate-45" />
+                    </button>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">
-                      Extracted Medical Data
-                    </p>
-                    {!isEditing && (
-                      <button
-                        onClick={startEditing}
-                        className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-all"
+                <div className="p-6 space-y-6 overflow-y-auto flex-1 custom-scrollbar">
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-1">
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">
+                        Current Status
+                      </p>
+                      <p
+                        className={`text-lg font-black ${selectedDoc.status === "completed" ? "text-emerald-500" : selectedDoc.status === "error" ? "text-rose-500" : "text-blue-500"}`}
                       >
-                        <Edit2 size={12} /> Edit Data
-                      </button>
-                    )}
+                        {selectedDoc.status.toUpperCase()}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">
+                        AI Accuracy Score
+                      </p>
+                      <p
+                        className={`text-lg font-black ${selectedDoc.status === "error" ? "text-rose-500" : "text-white"}`}
+                      >
+                        {(selectedDoc.confidence * 100).toFixed(1)}%
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="space-y-3">
-                    {selectedDoc.extractedData ? (
-                      Object.entries(selectedDoc.extractedData).map(
-                        ([key, value]: [string, any]) => {
-                          const risk = classifyRiskLevel(key, value);
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">
+                        Extracted Medical Data
+                      </p>
+                      {!isEditing && (
+                        <button
+                          onClick={startEditing}
+                          className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-all"
+                        >
+                          <Edit2 size={12} /> Edit Data
+                        </button>
+                      )}
+                    </div>
 
-                          return (
-                            <div
-                              key={key}
-                              className={`flex justify-between items-start gap-4 p-4 rounded-2xl border transition-all ${risk.container}`}
-                            >
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-3 mb-1">
-                                  <span className="text-slate-200 font-semibold capitalize text-sm">
-                                    {key.replace("_", " ")}
-                                  </span>
-                                  {renderRiskBadge(key, value)}
+                    <div className="space-y-3">
+                      {selectedDoc.extractedData ? (
+                        Object.entries(selectedDoc.extractedData).map(
+                          ([key, value]: [string, any]) => {
+                            const risk = classifyRiskLevel(key, value);
+
+                            return (
+                              <div
+                                key={key}
+                                className={`flex justify-between items-start gap-4 p-4 rounded-2xl border transition-all ${risk.container}`}
+                              >
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center gap-3 mb-1">
+                                    <span className="text-slate-200 font-semibold capitalize text-sm">
+                                      {key.replace("_", " ")}
+                                    </span>
+                                    {renderRiskBadge(key, value)}
+                                  </div>
+                                  <p className="text-[11px] text-slate-500">
+                                    {risk.hint}
+                                  </p>
                                 </div>
-                                <p className="text-[11px] text-slate-500">
-                                  {risk.hint}
-                                </p>
+                                {isEditing ? (
+                                  <input
+                                    type="text"
+                                    value={
+                                      typeof editForm[key] === "object"
+                                        ? JSON.stringify(editForm[key])
+                                        : String(editForm[key] || "")
+                                    }
+                                    onChange={(e) =>
+                                      setEditForm({
+                                        ...editForm,
+                                        [key]: e.target.value,
+                                      })
+                                    }
+                                    className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white font-bold focus:outline-none focus:ring-1 focus:ring-blue-500 text-right text-sm min-w-[180px]"
+                                  />
+                                ) : (
+                                  <span className="text-white font-bold text-right max-w-[60%] text-sm break-words leading-6">
+                                    {formatValue(value)}
+                                  </span>
+                                )}
                               </div>
-                              {isEditing ? (
-                                <input
-                                  type="text"
-                                  value={
-                                    typeof editForm[key] === "object"
-                                      ? JSON.stringify(editForm[key])
-                                      : String(editForm[key] || "")
-                                  }
-                                  onChange={(e) =>
-                                    setEditForm({
-                                      ...editForm,
-                                      [key]: e.target.value,
-                                    })
-                                  }
-                                  className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white font-bold focus:outline-none focus:ring-1 focus:ring-blue-500 text-right text-sm min-w-[180px]"
-                                />
-                              ) : (
-                                <span className="text-white font-bold text-right max-w-[60%] text-sm break-words leading-6">
-                                  {formatValue(value)}
-                                </span>
-                              )}
+                            );
+                          },
+                        )
+                      ) : (
+                        <div className="p-8 text-center text-slate-600 italic border border-dashed border-slate-800 rounded-2xl">
+                          Awaiting extraction results...
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {!isEditing && selectedDoc.extractedData && (
+                  <div className="px-8 py-4 border-t border-slate-800">
+                    <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500 mb-3">
+                      Risk Summary
+                    </p>
+                    <div className="grid grid-cols-3 gap-3">
+                      {(() => {
+                        const entries = Object.entries(selectedDoc.extractedData);
+                        const counts = entries.reduce(
+                          (acc, [key, value]) => {
+                            const risk = classifyRiskLevel(key, value);
+                            if (risk.tone === "critical") acc.red += 1;
+                            else if (risk.tone === "warning") acc.yellow += 1;
+                            else acc.green += 1;
+                            return acc;
+                          },
+                          { red: 0, yellow: 0, green: 0 },
+                        );
+
+                        return (
+                          <>
+                            <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4">
+                              <p className="text-[10px] uppercase tracking-[0.2em] text-red-300 font-black">
+                                Red
+                              </p>
+                              <p className="text-2xl font-black text-white mt-1">
+                                {counts.red}
+                              </p>
                             </div>
-                          );
-                        },
-                      )
-                    ) : (
-                      <div className="p-8 text-center text-slate-600 italic border border-dashed border-slate-800 rounded-2xl">
-                        Awaiting extraction results...
-                      </div>
-                    )}
+                            <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4">
+                              <p className="text-[10px] uppercase tracking-[0.2em] text-amber-300 font-black">
+                                Yellow
+                              </p>
+                              <p className="text-2xl font-black text-white mt-1">
+                                {counts.yellow}
+                              </p>
+                            </div>
+                            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4">
+                              <p className="text-[10px] uppercase tracking-[0.2em] text-emerald-300 font-black">
+                                Green
+                              </p>
+                              <p className="text-2xl font-black text-white mt-1">
+                                {counts.green}
+                              </p>
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </div>
                   </div>
-                </div>
-              </div>
-
-              {!isEditing && selectedDoc.extractedData && (
-                <div className="px-8 py-4 border-t border-slate-800">
-                  <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500 mb-3">
-                    Risk Summary
-                  </p>
-                  <div className="grid grid-cols-3 gap-3">
-                    {(() => {
-                      const entries = Object.entries(selectedDoc.extractedData);
-                      const counts = entries.reduce(
-                        (acc, [key, value]) => {
-                          const risk = classifyRiskLevel(key, value);
-                          if (risk.tone === "critical") acc.red += 1;
-                          else if (risk.tone === "warning") acc.yellow += 1;
-                          else acc.green += 1;
-                          return acc;
-                        },
-                        { red: 0, yellow: 0, green: 0 },
-                      );
-
-                      return (
-                        <>
-                          <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4">
-                            <p className="text-[10px] uppercase tracking-[0.2em] text-red-300 font-black">
-                              Red
-                            </p>
-                            <p className="text-2xl font-black text-white mt-1">
-                              {counts.red}
-                            </p>
-                          </div>
-                          <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4">
-                            <p className="text-[10px] uppercase tracking-[0.2em] text-amber-300 font-black">
-                              Yellow
-                            </p>
-                            <p className="text-2xl font-black text-white mt-1">
-                              {counts.yellow}
-                            </p>
-                          </div>
-                          <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4">
-                            <p className="text-[10px] uppercase tracking-[0.2em] text-emerald-300 font-black">
-                              Green
-                            </p>
-                            <p className="text-2xl font-black text-white mt-1">
-                              {counts.green}
-                            </p>
-                          </div>
-                        </>
-                      );
-                    })()}
-                  </div>
-                </div>
-              )}
-
-              <div className="p-6 bg-slate-900/50 border-t border-slate-800 flex gap-4">
-                {isEditing ? (
-                  <>
-                    <button
-                      onClick={saveEdit}
-                      className="flex-1 btn-premium justify-center"
-                    >
-                      <Check size={20} /> Save Changes
-                    </button>
-                    <button
-                      onClick={() => setIsEditing(false)}
-                      className="px-8 border border-slate-800 text-slate-400 hover:bg-white/5 rounded-2xl transition-all font-bold"
-                    >
-                      Cancel
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      onClick={() => handleApproveDocument(selectedDoc.id)}
-                      disabled={selectedDoc.isApproved}
-                      className={`flex-1 font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg ${
-                        selectedDoc.isApproved
-                          ? "bg-emerald-500/10 text-emerald-500 cursor-not-allowed border border-emerald-500/20"
-                          : "btn-premium justify-center"
-                      }`}
-                    >
-                      <CheckCircle2 size={20} />
-                      {selectedDoc.isApproved
-                        ? "Verification Complete"
-                        : "Approve & Verify"}
-                    </button>
-                    <button
-                      onClick={() => handleDelete(selectedDoc.id)}
-                      className="px-8 border border-slate-800 text-slate-400 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 rounded-2xl transition-all font-bold"
-                    >
-                      Delete
-                    </button>
-                  </>
                 )}
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+
+                <div className="p-6 bg-slate-900/50 border-t border-slate-800 flex gap-4">
+                  {isEditing ? (
+                    <>
+                      <button
+                        onClick={saveEdit}
+                        className="flex-1 btn-premium justify-center"
+                      >
+                        <Check size={20} /> Save Changes
+                      </button>
+                      <button
+                        onClick={() => setIsEditing(false)}
+                        className="px-8 border border-slate-800 text-slate-400 hover:bg-white/5 rounded-2xl transition-all font-bold"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => handleApproveDocument(selectedDoc.id)}
+                        disabled={selectedDoc.isApproved || isProcessing}
+                        className={`flex-1 font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg ${
+                          selectedDoc.isApproved
+                            ? "bg-emerald-500/10 text-emerald-500 cursor-not-allowed border border-emerald-500/20"
+                            : isProcessing
+                              ? "bg-blue-600/50 text-white cursor-wait"
+                              : "btn-premium justify-center"
+                        }`}
+                      >
+                        <CheckCircle2
+                          size={20}
+                          className={isProcessing ? "animate-spin" : ""}
+                        />
+                        {isProcessing
+                          ? "Verifying..."
+                          : selectedDoc.isApproved
+                            ? "Verification Complete"
+                            : "Approve & Verify"}
+                      </button>
+                      <button
+                        onClick={() => handleDelete(selectedDoc.id)}
+                        className="px-8 border border-slate-800 text-slate-400 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 rounded-2xl transition-all font-bold"
+                      >
+                        Delete
+                      </button>
+                    </>
+                  )}
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 };

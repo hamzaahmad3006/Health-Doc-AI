@@ -53,11 +53,25 @@ export const useDocuments = () => {
         formData.append("file", files[i]);
 
         try {
-          await axios.post("/api/documents/upload/", formData, {
+          const res = await axios.post("/api/documents/upload/", formData, {
             headers: {
               "Content-Type": "multipart/form-data",
             },
           });
+
+          // Auto-open the analysis modal for the newly uploaded document
+          if (res.data) {
+            const mappedDoc = {
+              id: res.data.id,
+              filename: res.data.filename,
+              status: res.data.status,
+              confidence: res.data.confidence_score,
+              isApproved: res.data.is_approved,
+              date: new Date(res.data.created_at).toLocaleDateString(),
+              extractedData: res.data.extracted_data,
+            };
+            setSelectedDoc(mappedDoc);
+          }
         } catch (uploadErr: any) {
           // Check if this is a non-medical rejection (422)
           if (uploadErr?.response?.status === 422) {
@@ -122,9 +136,15 @@ export const useDocuments = () => {
     }
   };
 
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const handleUpdateDocument = async (docId: string, updates: any) => {
+    if (isProcessing) return;
+    setIsProcessing(true);
+    console.log(`[UI] Updating document ${docId}...`, updates);
     try {
       const res = await axios.patch(`/api/documents/${docId}`, updates);
+      console.log(`[UI] Update successful for ${docId}`);
       await fetchDocuments();
       // Update selectedDoc if it's the one being edited
       if (selectedDoc?.id === docId) {
@@ -141,10 +161,14 @@ export const useDocuments = () => {
       }
     } catch (err) {
       console.error("Update failed:", err);
+    } finally {
+      setIsProcessing(true); // Keep it true briefly to avoid spam? No, set to false.
+      setIsProcessing(false);
     }
   };
 
   const handleApproveDocument = async (docId: string) => {
+    console.log(`[UI] Approving document ${docId}...`);
     await handleUpdateDocument(docId, { is_approved: true });
   };
 
@@ -195,6 +219,7 @@ export const useDocuments = () => {
     allDocuments: documents,
     isLoading,
     isUploading,
+    isProcessing,
     uploadProgress,
     handleUpload,
     handleMultiUpload,
