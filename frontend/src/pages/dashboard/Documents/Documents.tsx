@@ -16,6 +16,13 @@ import {
   Check,
   ShieldAlert,
   X,
+  Activity,
+  Heart,
+  Droplets,
+  Thermometer,
+  Zap,
+  Info,
+  CircleDot,
 } from "lucide-react";
 import { useDocuments } from "./Documents.logic";
 import FileUpload from "../../../components/dashboard/FileUpload";
@@ -85,6 +92,14 @@ const DocumentsPage: React.FC = () => {
       normalizedKey.includes("bp") || normalizedKey.includes("blood pressure");
     const isHeartRate = normalizedKey.includes("heart rate");
     const isTemperature = normalizedKey.includes("temperature");
+    const isMedical = normalizedKey.includes("is medical");
+
+    let icon = <CircleDot size={14} />;
+    if (isGlucose) icon = <Droplets size={14} />;
+    if (isBloodPressure) icon = <Zap size={14} />;
+    if (isHeartRate) icon = <Heart size={14} />;
+    if (isTemperature) icon = <Thermometer size={14} />;
+    if (isMedical) icon = <ShieldAlert size={14} />;
 
     if (isGlucose && numericValue !== null) {
       if (numericValue >= 140) {
@@ -93,6 +108,7 @@ const DocumentsPage: React.FC = () => {
           tone: "critical",
           container: "border-red-500/40 bg-red-500/10 text-red-300",
           hint: "Immediate doctor review recommended",
+          icon,
         };
       }
       if (numericValue >= 110) {
@@ -101,6 +117,7 @@ const DocumentsPage: React.FC = () => {
           tone: "warning",
           container: "border-amber-500/40 bg-amber-500/10 text-amber-300",
           hint: "Needs attention",
+          icon,
         };
       }
     }
@@ -112,6 +129,7 @@ const DocumentsPage: React.FC = () => {
           tone: "critical",
           container: "border-red-500/40 bg-red-500/10 text-red-300",
           hint: "Immediate doctor review recommended",
+          icon: <Activity size={14} />,
         };
       }
       if (numericValue >= 170) {
@@ -120,6 +138,7 @@ const DocumentsPage: React.FC = () => {
           tone: "warning",
           container: "border-amber-500/40 bg-amber-500/10 text-amber-300",
           hint: "Needs attention",
+          icon: <Activity size={14} />,
         };
       }
     }
@@ -131,6 +150,7 @@ const DocumentsPage: React.FC = () => {
           tone: "critical",
           container: "border-red-500/40 bg-red-500/10 text-red-300",
           hint: "Immediate doctor review recommended",
+          icon,
         };
       }
       if (numericValue >= 130) {
@@ -139,6 +159,7 @@ const DocumentsPage: React.FC = () => {
           tone: "warning",
           container: "border-amber-500/40 bg-amber-500/10 text-amber-300",
           hint: "Needs attention",
+          icon,
         };
       }
     }
@@ -150,6 +171,7 @@ const DocumentsPage: React.FC = () => {
           tone: "warning",
           container: "border-amber-500/40 bg-amber-500/10 text-amber-300",
           hint: "Needs attention",
+          icon,
         };
       }
     }
@@ -161,6 +183,7 @@ const DocumentsPage: React.FC = () => {
           tone: "warning",
           container: "border-amber-500/40 bg-amber-500/10 text-amber-300",
           hint: "Needs attention",
+          icon,
         };
       }
     }
@@ -171,6 +194,7 @@ const DocumentsPage: React.FC = () => {
         tone: "warning",
         container: "border-amber-500/40 bg-amber-500/10 text-amber-300",
         hint: "Needs attention",
+        icon,
       };
     }
 
@@ -179,6 +203,7 @@ const DocumentsPage: React.FC = () => {
       tone: "normal",
       container: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
       hint: "Within normal range",
+      icon,
     };
   };
 
@@ -193,14 +218,32 @@ const DocumentsPage: React.FC = () => {
     );
   };
 
-  const formatValue = (value: any): string => {
-    if (value === null || value === undefined) return "null";
+  const formatValue = (value: any): React.ReactNode => {
+    if (value === null || value === undefined || value === "") {
+      return (
+        <span className="text-slate-600 italic font-medium tracking-wide">
+          Not Detected
+        </span>
+      );
+    }
+    if (typeof value === "boolean") {
+      return value ? (
+        <span className="text-emerald-400 font-bold">Yes</span>
+      ) : (
+        <span className="text-slate-500 font-bold">No</span>
+      );
+    }
     if (typeof value !== "object") return String(value);
     if (Array.isArray(value)) {
-      return value.map((item) => formatValue(item)).join(", ");
+      return value.map((item, i) => (
+        <React.Fragment key={i}>
+          {formatValue(item)}
+          {i < value.length - 1 ? ", " : ""}
+        </React.Fragment>
+      ));
     }
     return Object.entries(value)
-      .map(([sk, sv]) => `${sk}: ${formatValue(sv)}`)
+      .map(([sk, sv]) => `${sk}: ${sv}`)
       .join(" | ");
   };
 
@@ -477,200 +520,222 @@ const DocumentsPage: React.FC = () => {
       {createPortal(
         <AnimatePresence>
           {selectedDoc && (
-            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-2xl">
               <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                initial={{ opacity: 0, scale: 0.9, y: 30 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="glass-card w-full max-w-2xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col"
+                exit={{ opacity: 0, scale: 0.9, y: 30 }}
+                className="glass-card w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] border-white/5 flex flex-col relative"
               >
-                <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
-                  <div>
-                    <h2 className="text-2xl font-black text-white">
-                      Medical Analysis
-                    </h2>
-                    <p className="text-slate-400 text-sm mt-1">
-                      {selectedDoc.filename}
-                    </p>
+                {/* Background Glows */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 blur-[100px] -z-10" />
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 blur-[100px] -z-10" />
+
+                {/* Header Section */}
+                <div className="p-8 border-b border-white/5 flex justify-between items-start bg-white/[0.02]">
+                  <div className="flex gap-6">
+                    {/* Circular Confidence Score */}
+                    <div className="relative w-24 h-24 flex items-center justify-center">
+                      <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="42"
+                          fill="transparent"
+                          stroke="rgba(255,255,255,0.05)"
+                          strokeWidth="8"
+                        />
+                        <motion.circle
+                          cx="50"
+                          cy="50"
+                          r="42"
+                          fill="transparent"
+                          stroke="url(#blue_grad)"
+                          strokeWidth="8"
+                          strokeDasharray="264"
+                          initial={{ strokeDashoffset: 264 }}
+                          animate={{
+                            strokeDashoffset: 264 - (264 * selectedDoc.confidence),
+                          }}
+                          transition={{ duration: 1.5, ease: "easeOut" }}
+                          strokeLinecap="round"
+                        />
+                        <defs>
+                          <linearGradient id="blue_grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stopColor="#3b82f6" />
+                            <stop offset="100%" stopColor="#2dd4bf" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div className="absolute flex flex-col items-center">
+                        <span className="text-xl font-black text-white leading-none">
+                          {Math.round(selectedDoc.confidence * 100)}%
+                        </span>
+                        <span className="text-[8px] uppercase font-black text-slate-500 mt-1 tracking-tighter">
+                          AI Match
+                        </span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h2 className="text-3xl font-black tracking-tighter text-white mb-2">
+                        Medical <span className="text-gradient">Analysis</span>
+                      </h2>
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/10">
+                          <FileText size={12} className="text-blue-400" />
+                          <span className="text-[11px] font-bold text-slate-400">
+                            {selectedDoc.filename}
+                          </span>
+                        </div>
+                        {selectedDoc.isApproved && (
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-500/30 flex items-center gap-2"
+                          >
+                            <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+                            Verified
+                          </motion.div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    {selectedDoc.isApproved && (
-                      <span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-xs font-bold uppercase tracking-wider rounded-lg border border-emerald-500/20">
-                        Doctor Approved
-                      </span>
-                    )}
-                    <button
-                      onClick={() => {
-                        setIsEditing(false);
-                        closeDetails();
-                      }}
-                      className="p-2 hover:bg-white/5 rounded-xl text-slate-500 hover:text-white transition-all"
-                    >
-                      <AlertCircle size={24} className="rotate-45" />
-                    </button>
+
+                  <button
+                    onClick={() => {
+                      setIsEditing(false);
+                      closeDetails();
+                    }}
+                    className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl text-slate-500 hover:text-white transition-all group"
+                  >
+                    <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+                  </button>
+                </div>
+
+                {/* Sub-Header Stats */}
+                <div className="px-8 py-4 bg-white/[0.01] border-b border-white/5 flex gap-12">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase font-black text-slate-500 tracking-widest leading-none mb-2">Status</span>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${selectedDoc.status === "completed" ? "bg-emerald-500" : "bg-blue-500"}`} />
+                      <span className="text-xs font-black text-white uppercase tracking-wider">{selectedDoc.status}</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase font-black text-slate-500 tracking-widest leading-none mb-2">Patient Class</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-black text-blue-400 uppercase tracking-wider">Out-Patient</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col ml-auto text-right">
+                    <span className="text-[10px] uppercase font-black text-slate-500 tracking-widest leading-none mb-2">Last Sync</span>
+                    <span className="text-xs font-black text-white">{selectedDoc.date}</span>
                   </div>
                 </div>
 
-                <div className="p-6 space-y-6 overflow-y-auto flex-1 custom-scrollbar">
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="space-y-1">
-                      <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">
-                        Current Status
-                      </p>
-                      <p
-                        className={`text-lg font-black ${selectedDoc.status === "completed" ? "text-emerald-500" : selectedDoc.status === "error" ? "text-rose-500" : "text-blue-500"}`}
-                      >
-                        {selectedDoc.status.toUpperCase()}
-                      </p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">
-                        AI Accuracy Score
-                      </p>
-                      <p
-                        className={`text-lg font-black ${selectedDoc.status === "error" ? "text-rose-500" : "text-white"}`}
-                      >
-                        {(selectedDoc.confidence * 100).toFixed(1)}%
-                      </p>
-                    </div>
+                {/* Scrollable Content */}
+                <div className="p-8 space-y-8 overflow-y-auto flex-1 custom-scrollbar">
+                  {/* Risk Summary Tiles */}
+                  <div className="grid grid-cols-3 gap-4">
+                    {(() => {
+                      const entries = Object.entries(selectedDoc.extractedData || {});
+                      const counts = entries.reduce((acc, [key, value]) => {
+                        const risk = classifyRiskLevel(key, value);
+                        if (risk.tone === "critical") acc.red += 1;
+                        else if (risk.tone === "warning") acc.yellow += 1;
+                        else acc.green += 1;
+                        return acc;
+                      }, { red: 0, yellow: 0, green: 0 });
+
+                      const statTiles = [
+                        { label: "Critical Risks", count: counts.red, color: "from-rose-500/20 to-rose-600/5", text: "text-rose-400", border: "border-rose-500/20", icon: <ShieldAlert size={16} /> },
+                        { label: "Potential Warnings", count: counts.yellow, color: "from-amber-500/20 to-amber-600/5", text: "text-amber-400", border: "border-amber-500/20", icon: <Activity size={16} /> },
+                        { label: "Normal Indicators", count: counts.green, color: "from-emerald-500/20 to-emerald-600/5", text: "text-emerald-400", border: "border-emerald-500/20", icon: <CheckCircle2 size={16} /> }
+                      ];
+
+                      return statTiles.map((tile, idx) => (
+                        <div key={idx} className={`relative group p-4 rounded-3xl border ${tile.border} bg-gradient-to-br ${tile.color}`}>
+                          <div className="flex justify-between items-start mb-2">
+                            <span className={`${tile.text} p-2 bg-white/5 rounded-xl`}>{tile.icon}</span>
+                            <span className={`text-2xl font-black text-white`}>{tile.count}</span>
+                          </div>
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 leading-tight">{tile.label}</p>
+                        </div>
+                      ));
+                    })()}
                   </div>
 
+                  {/* Extracted Medical Data */}
                   <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">
-                        Extracted Medical Data
-                      </p>
+                    <div className="flex justify-between items-center px-2">
+                      <h4 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
+                        <Activity size={16} className="text-blue-500" />
+                        Analysis Feed
+                      </h4>
                       {!isEditing && (
-                        <button
-                          onClick={startEditing}
-                          className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-all"
-                        >
-                          <Edit2 size={12} /> Edit Data
+                        <button onClick={startEditing} className="text-[10px] font-black uppercase text-blue-400 hover:text-white transition-colors tracking-widest border border-blue-500/30 px-3 py-1.5 rounded-full bg-blue-500/10">
+                          Edit Data
                         </button>
                       )}
                     </div>
 
                     <div className="space-y-3">
                       {selectedDoc.extractedData ? (
-                        Object.entries(selectedDoc.extractedData).map(
-                          ([key, value]: [string, any]) => {
-                            const risk = classifyRiskLevel(key, value);
-
-                            return (
-                              <div
-                                key={key}
-                                className={`flex justify-between items-start gap-4 p-4 rounded-2xl border transition-all ${risk.container}`}
-                              >
-                                <div className="min-w-0 flex-1">
-                                  <div className="flex items-center gap-3 mb-1">
-                                    <span className="text-slate-200 font-semibold capitalize text-sm">
-                                      {key.replace("_", " ")}
-                                    </span>
-                                    {renderRiskBadge(key, value)}
+                        Object.entries(selectedDoc.extractedData).map(([key, value]: [string, any], idx) => {
+                          const risk = classifyRiskLevel(key, value);
+                          return (
+                            <motion.div
+                              key={key}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: idx * 0.05 }}
+                              className="group p-5 bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 rounded-3xl transition-all space-y-4"
+                            >
+                              <div className="flex items-center justify-between gap-4">
+                                <div className="flex items-center gap-3">
+                                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all shrink-0 ${risk.container}`}>
+                                    {risk.icon}
                                   </div>
-                                  <p className="text-[11px] text-slate-500">
-                                    {risk.hint}
-                                  </p>
-                                </div>
-                                {isEditing ? (
-                                  <input
-                                    type="text"
-                                    value={
-                                      typeof editForm[key] === "object"
-                                        ? JSON.stringify(editForm[key])
-                                        : String(editForm[key] || "")
-                                    }
-                                    onChange={(e) =>
-                                      setEditForm({
-                                        ...editForm,
-                                        [key]: e.target.value,
-                                      })
-                                    }
-                                    className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white font-bold focus:outline-none focus:ring-1 focus:ring-blue-500 text-right text-sm min-w-[180px]"
-                                  />
-                                ) : (
-                                  <span className="text-white font-bold text-right max-w-[60%] text-sm break-words leading-6">
-                                    {formatValue(value)}
+                                  <span className="text-[11px] uppercase font-black text-slate-500 tracking-[0.2em]">
+                                    {key.replace("_", " ")}
                                   </span>
-                                )}
+                                </div>
+                                <div className="flex flex-col items-end shrink-0">
+                                  <span className={`text-[10px] font-black px-3 py-1 rounded-full border tracking-tighter ${risk.container}`}>
+                                    {risk.label}
+                                  </span>
+                                </div>
                               </div>
-                            );
-                          },
-                        )
+
+                              <div className="pl-1 text-sm font-bold text-white group-hover:text-blue-400 transition-colors leading-relaxed break-words max-w-full">
+                                {formatValue(value)}
+                              </div>
+
+                              <div className="pl-1 border-t border-white/5 pt-3">
+                                <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">{risk.hint}</span>
+                              </div>
+                            </motion.div>
+                          );
+                        })
                       ) : (
-                        <div className="p-8 text-center text-slate-600 italic border border-dashed border-slate-800 rounded-2xl">
-                          Awaiting extraction results...
+                        <div className="py-12 flex flex-col items-center justify-center text-slate-600 border-2 border-dashed border-white/5 rounded-3xl italic">
+                          <Activity className="animate-pulse mb-3" size={32} />
+                          Awaiting AI extraction sequence...
                         </div>
                       )}
                     </div>
                   </div>
                 </div>
 
-                {!isEditing && selectedDoc.extractedData && (
-                  <div className="px-8 py-4 border-t border-slate-800">
-                    <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500 mb-3">
-                      Risk Summary
-                    </p>
-                    <div className="grid grid-cols-3 gap-3">
-                      {(() => {
-                        const entries = Object.entries(selectedDoc.extractedData);
-                        const counts = entries.reduce(
-                          (acc, [key, value]) => {
-                            const risk = classifyRiskLevel(key, value);
-                            if (risk.tone === "critical") acc.red += 1;
-                            else if (risk.tone === "warning") acc.yellow += 1;
-                            else acc.green += 1;
-                            return acc;
-                          },
-                          { red: 0, yellow: 0, green: 0 },
-                        );
-
-                        return (
-                          <>
-                            <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4">
-                              <p className="text-[10px] uppercase tracking-[0.2em] text-red-300 font-black">
-                                Red
-                              </p>
-                              <p className="text-2xl font-black text-white mt-1">
-                                {counts.red}
-                              </p>
-                            </div>
-                            <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4">
-                              <p className="text-[10px] uppercase tracking-[0.2em] text-amber-300 font-black">
-                                Yellow
-                              </p>
-                              <p className="text-2xl font-black text-white mt-1">
-                                {counts.yellow}
-                              </p>
-                            </div>
-                            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4">
-                              <p className="text-[10px] uppercase tracking-[0.2em] text-emerald-300 font-black">
-                                Green
-                              </p>
-                              <p className="text-2xl font-black text-white mt-1">
-                                {counts.green}
-                              </p>
-                            </div>
-                          </>
-                        );
-                      })()}
-                    </div>
-                  </div>
-                )}
-
-                <div className="p-6 bg-slate-900/50 border-t border-slate-800 flex gap-4">
+                {/* Footer Actions */}
+                <div className="p-8 bg-white/[0.02] border-t border-white/5 flex gap-4">
                   {isEditing ? (
                     <>
-                      <button
-                        onClick={saveEdit}
-                        className="flex-1 btn-premium justify-center"
-                      >
+                      <button onClick={saveEdit} className="flex-1 btn-premium justify-center py-5 shadow-blue-500/20">
                         <Check size={20} /> Save Changes
                       </button>
-                      <button
-                        onClick={() => setIsEditing(false)}
-                        className="px-8 border border-slate-800 text-slate-400 hover:bg-white/5 rounded-2xl transition-all font-bold"
-                      >
+                      <button onClick={() => setIsEditing(false)} className="px-10 border border-white/10 text-slate-400 hover:bg-white/5 rounded-[2rem] transition-all font-black text-sm uppercase tracking-widest">
                         Cancel
                       </button>
                     </>
@@ -679,29 +744,22 @@ const DocumentsPage: React.FC = () => {
                       <button
                         onClick={() => handleApproveDocument(selectedDoc.id)}
                         disabled={selectedDoc.isApproved || isProcessing}
-                        className={`flex-1 font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg ${
+                        className={`flex-1 font-black uppercase tracking-[0.2em] text-sm py-5 rounded-[2rem] transition-all flex items-center justify-center gap-3 shadow-2xl ${
                           selectedDoc.isApproved
                             ? "bg-emerald-500/10 text-emerald-500 cursor-not-allowed border border-emerald-500/20"
                             : isProcessing
                               ? "bg-blue-600/50 text-white cursor-wait"
-                              : "btn-premium justify-center"
+                              : "btn-premium justify-center shadow-blue-500/25"
                         }`}
                       >
-                        <CheckCircle2
-                          size={20}
-                          className={isProcessing ? "animate-spin" : ""}
-                        />
-                        {isProcessing
-                          ? "Verifying..."
-                          : selectedDoc.isApproved
-                            ? "Verification Complete"
-                            : "Approve & Verify"}
+                        <CheckCircle2 size={24} className={isProcessing ? "animate-spin" : ""} />
+                        {isProcessing ? "Processing..." : selectedDoc.isApproved ? "Analysis Verified" : "Approve & Verify"}
                       </button>
                       <button
                         onClick={() => handleDelete(selectedDoc.id)}
-                        className="px-8 border border-slate-800 text-slate-400 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 rounded-2xl transition-all font-bold"
+                        className="px-8 border border-white/5 text-slate-600 hover:bg-rose-500/10 hover:text-rose-500 hover:border-rose-500/20 rounded-[2rem] transition-all font-black text-sm uppercase tracking-widest"
                       >
-                        Delete
+                        <Trash2 size={20} />
                       </button>
                     </>
                   )}
