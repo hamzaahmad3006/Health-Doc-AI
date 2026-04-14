@@ -146,7 +146,7 @@ const LoginPage: React.FC = () => {
                 to="/register"
                 className="text-white hover:text-blue-400 transition-colors font-bold ml-1 border-b border-white/20 hover:border-blue-400 pb-0.5"
               >
-                Create Hub Account
+                Create an Account
               </Link>
             </p>
           </div>
