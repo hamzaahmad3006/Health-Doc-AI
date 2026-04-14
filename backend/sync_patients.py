@@ -1,8 +1,8 @@
 import os
 import json
 from sqlalchemy.orm import Session
-from database import SessionLocal
-from models import Document, Patient
+from backend.database import SessionLocal
+from backend.models import Document, Patient
 
 def sync_patients():
     db: Session = SessionLocal()

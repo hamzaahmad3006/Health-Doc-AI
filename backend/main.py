@@ -7,9 +7,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi.staticfiles import StaticFiles
-from database import SessionLocal, engine
-from models import Base, User
-from routes import document_routes, auth_routes
+from backend.database import SessionLocal, engine
+from backend.models import Base, User
+from backend.routes import document_routes, auth_routes
 
 # Ensure directories exist
 os.makedirs(os.path.join(BASE_DIR, "static/logos"), exist_ok=True)
@@ -43,7 +43,7 @@ def startup_event():
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"], # Frontend origin
+    allow_origins=["*"], # Allow all origins for production; change to specific domain later if needed
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

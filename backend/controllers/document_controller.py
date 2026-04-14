@@ -6,8 +6,8 @@ import datetime
 from fastapi import UploadFile, HTTPException
 from sqlalchemy.orm import Session
 from typing import Any
-from models import Document, AuditLog, WorkspaceConfig, Patient
-from services.ai_service import AIService
+from backend.models import Document, AuditLog, WorkspaceConfig, Patient
+from backend.services.ai_service import AIService
 
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas

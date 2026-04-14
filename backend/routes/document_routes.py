@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, UploadFile, File
 from sqlalchemy.orm import Session
 from typing import List
-from database import get_db
-from controllers import document_controller
-import schemas
+from backend.database import get_db
+from backend.controllers import document_controller
+from backend import schemas
 
-from services.ai_service import AIService
-from services.fhir_service import FHIRService
+from backend.services.ai_service import AIService
+from backend.services.fhir_service import FHIRService
 
 router = APIRouter(redirect_slashes=False)
 
