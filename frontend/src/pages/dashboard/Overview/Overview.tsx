@@ -118,7 +118,7 @@ const OverviewPage: React.FC = () => {
             icon={Users}
             options={patients}
             value={selectedPatientId}
-            onChange={setSelectedPatientId}
+            onChange={(val) => setSelectedPatientId(val as number | null)}
             allLabel="All Active Patients"
           />
 
