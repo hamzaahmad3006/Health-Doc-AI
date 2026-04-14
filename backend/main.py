@@ -11,8 +11,11 @@ from backend.database import SessionLocal, engine
 from backend.models import Base, User
 from backend.routes import document_routes, auth_routes
 
-# Ensure directories exist
-os.makedirs(os.path.join(BASE_DIR, "static/logos"), exist_ok=True)
+# Ensure directories exist (wrapped for Vercel read-only filesystem)
+try:
+    os.makedirs(os.path.join(BASE_DIR, "static/logos"), exist_ok=True)
+except OSError:
+    print("Warning: Could not create static/logos directory. Running in read-only environment.")
 
 # Ensure tables are created
 Base.metadata.create_all(bind=engine)

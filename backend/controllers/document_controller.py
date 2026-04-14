@@ -29,9 +29,20 @@ def create_audit_log(db: Session, user_id: int, action: str, resource_type: str,
     db.add(audit_entry)
     db.commit()
 
-UPLOAD_DIR = "uploads"
+# Use /tmp for uploads on Vercel environment
+if os.environ.get("VERCEL"):
+    UPLOAD_DIR = "/tmp/uploads"
+else:
+    UPLOAD_DIR = "uploads"
+
 if not os.path.exists(UPLOAD_DIR):
-    os.makedirs(UPLOAD_DIR)
+    try:
+        os.makedirs(UPLOAD_DIR, exist_ok=True)
+    except OSError:
+        # Fallback for extreme cases
+        UPLOAD_DIR = "/tmp/uploads"
+        if not os.path.exists(UPLOAD_DIR):
+            os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 async def list_documents(db: Session, patient_id: int = None):
     # Log access (Generic list access)
@@ -268,8 +279,12 @@ async def upload_clinic_logo(file: UploadFile, db: Session, user_id: int = 1):
     """
     config = await get_config(db, user_id)
     
-    # Create directory if not exists
-    logo_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static/logos")
+    # Create directory if not exists (handling Vercel read-only)
+    if os.environ.get("VERCEL"):
+        logo_dir = "/tmp/static/logos"
+    else:
+        logo_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static/logos")
+        
     os.makedirs(logo_dir, exist_ok=True)
     
     # Generate unique filename
