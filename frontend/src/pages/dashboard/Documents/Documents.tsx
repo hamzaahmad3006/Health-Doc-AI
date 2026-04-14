@@ -45,6 +45,18 @@ const DocumentsPage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<any>({});
 
+  // Fix: Lock body scroll when modal is open
+  React.useEffect(() => {
+    if (selectedDoc) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [selectedDoc]);
+
   const normalizeFieldKey = (key: string) =>
     key
       .toLowerCase()
@@ -463,14 +475,14 @@ const DocumentsPage: React.FC = () => {
       {/* Details Modal */}
       <AnimatePresence>
         {selectedDoc && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-10 md:pt-20 bg-slate-950/80 backdrop-blur-md">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               className="glass-card w-full max-w-2xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col"
             >
-              <div className="p-8 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+              <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
                 <div>
                   <h2 className="text-2xl font-black text-white">
                     Medical Analysis
@@ -497,7 +509,7 @@ const DocumentsPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="p-8 space-y-8 overflow-y-auto flex-1 custom-scrollbar">
+              <div className="p-6 space-y-6 overflow-y-auto flex-1 custom-scrollbar">
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-1">
                     <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">
@@ -644,7 +656,7 @@ const DocumentsPage: React.FC = () => {
                 </div>
               )}
 
-              <div className="p-8 bg-slate-900/50 border-t border-slate-800 flex gap-4">
+              <div className="p-6 bg-slate-900/50 border-t border-slate-800 flex gap-4">
                 {isEditing ? (
                   <>
                     <button
