@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export const useLogin = () => {
   const [email, setEmail] = useState("");
@@ -7,21 +8,24 @@ export const useLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
     try {
-      // Mock API call
-      console.log("Logging in with:", { email, password });
-      await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate delay
+      const response = await axios.post("/api/login", { email, password });
+      
+      if (response.data.status === "success") {
+        // Save token and user info
+        localStorage.setItem("token", "mock-jwt-token-123"); 
+        localStorage.setItem("user", JSON.stringify(response.data.user));
 
-      // Navigate to dashboard on success
-      navigate("/dashboard");
-    } catch (err) {
-      setError("Invalid credentials. Please try again.");
+        // Navigate to dashboard
+        navigate("/dashboard");
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.detail || "Invalid credentials. Please try again.");
     } finally {
       setIsLoading(false);
     }

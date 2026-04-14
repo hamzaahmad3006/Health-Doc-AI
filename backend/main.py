@@ -58,7 +58,7 @@ app.add_middleware(
 )
 
 # Include routes
-app.include_router(auth_routes.router, prefix="/api/auth", tags=["Authentication"])
+app.include_router(auth_routes.router, prefix="/api", tags=["Authentication"])
 app.include_router(document_routes.router, prefix="/api/documents", tags=["Documents"])
 
 @app.get("/")

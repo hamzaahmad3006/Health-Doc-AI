@@ -91,7 +91,11 @@ const DashboardLayout: React.FC<{ children?: React.ReactNode }> = ({
 
         <div className="pt-6 mt-6 border-t border-slate-900">
           <button
-            onClick={() => navigate("/login")}
+            onClick={() => {
+              localStorage.removeItem("token");
+              localStorage.removeItem("user");
+              navigate("/login");
+            }}
             className="w-full flex items-center space-x-3 px-4 py-3 rounded-2xl text-slate-500 hover:bg-red-500/10 hover:text-red-400 transition-all group font-bold"
           >
             <LogOut
