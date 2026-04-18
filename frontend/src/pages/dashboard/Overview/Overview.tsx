@@ -201,7 +201,7 @@ const OverviewPage: React.FC = () => {
           </div>
         </motion.div>
       )}
-      {alerts.length > 0 && (
+      {selectedPatientId && alerts.length > 0 && (
         <motion.div variants={itemVariants} className="relative group">
           <div className="absolute -inset-0.5 bg-gradient-to-r from-red-500 to-rose-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200 animate-pulse" />
           <div className="glass-card relative flex items-center justify-between p-5 border-l-4 border-l-red-500 rounded-2xl">
