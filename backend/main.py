@@ -27,8 +27,9 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Document Processing API")
 
-# Mount Static Files
-app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
+static_dir = os.path.join(BASE_DIR, "static")
+if os.path.isdir(static_dir):
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 @app.on_event("startup")
 def startup_event():

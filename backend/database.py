@@ -7,7 +7,10 @@ load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Default to SQLite if DATABASE_URL is not set
-DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{os.path.join(BASE_DIR, 'backend_db.sqlite')}")
+# On Vercel (or other serverless read-only functions), we must write SQLite to /tmp
+is_vercel = os.environ.get("VERCEL") == "1"
+db_path = os.path.join("/tmp" if is_vercel else BASE_DIR, 'backend_db.sqlite')
+DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{db_path}")
 
 # Fix for Supabase/PostgreSQL connection string prefixes if needed
 if DATABASE_URL.startswith("postgres://"):
