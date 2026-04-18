@@ -15,6 +15,7 @@ interface CustomSelectProps {
   icon?: LucideIcon;
   placeholder?: string;
   allLabel?: string;
+  hideAllOption?: boolean;
 }
 
 const CustomSelect: React.FC<CustomSelectProps> = ({
@@ -24,7 +25,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   label,
   icon: Icon,
   placeholder = "Select an option",
-  allLabel = "All Active Patients",
+  allLabel = "Select Patient",
+  hideAllOption = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -91,20 +93,22 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
             {/* Scrollable area */}
             <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
               {/* "All" Option */}
-              <button
-                onClick={() => {
-                  onChange(null);
-                  setIsOpen(false);
-                }}
-                className={`w-full flex items-center justify-between px-5 py-3 text-xs font-bold transition-all hover:bg-white/5 ${
-                  value === null ? "text-white" : "text-slate-400"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  {value === null && <Check size={14} className="text-blue-400" />}
-                  <span>{allLabel}</span>
-                </div>
-              </button>
+              {!hideAllOption && (
+                <button
+                  onClick={() => {
+                    onChange(null);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between px-5 py-3 text-xs font-bold transition-all hover:bg-white/5 ${
+                    value === null ? "text-white" : "text-slate-400"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    {value === null && <Check size={14} className="text-blue-400" />}
+                    <span>{allLabel}</span>
+                  </div>
+                </button>
+              )}
 
               {/* Patient Options */}
               {options.map((option) => (

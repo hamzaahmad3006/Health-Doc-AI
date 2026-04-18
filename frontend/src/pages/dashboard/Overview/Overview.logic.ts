@@ -4,10 +4,16 @@ import axios from "axios";
 import dummyTrends from "./data.json";
 
 export const useOverview = () => {
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<{
+    totalProcessed: number;
+    pendingReview: number;
+    accuracyRate: number;
+    lastVisit: string | null;
+  }>({
     totalProcessed: 0,
     pendingReview: 0,
     accuracyRate: 0,
+    lastVisit: null,
   });
   const [recentDocs, setRecentDocs] = useState<any[]>([]);
   const [trends, setTrends] = useState<any[]>(dummyTrends);
@@ -174,8 +180,28 @@ export const useOverview = () => {
     doc.filename.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
+  const formatRelativeDate = (dateStr: string | null) => {
+    if (!dateStr) return "N/A";
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffInMs = now.getTime() - date.getTime();
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+    if (diffInDays === 0) return "Today";
+    if (diffInDays === 1) return "Yesterday";
+    if (diffInDays < 7) return `${diffInDays} days ago`;
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
   return {
-    stats,
+    stats: {
+      ...stats,
+      formattedLastVisit: formatRelativeDate(stats.lastVisit),
+    },
     recentDocs: filteredRecentDocs,
     allRecentDocs: recentDocs,
     trends,

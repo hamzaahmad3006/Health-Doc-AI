@@ -119,7 +119,8 @@ const OverviewPage: React.FC = () => {
             options={patients}
             value={selectedPatientId}
             onChange={(val) => setSelectedPatientId(val as number | null)}
-            allLabel="All Active Patients"
+            allLabel="Select Patient"
+            hideAllOption={true}
           />
 
           <div className="relative flex-1 lg:w-72">
@@ -192,7 +193,9 @@ const OverviewPage: React.FC = () => {
                 <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">
                   Last Visit
                 </p>
-                <p className="text-xl font-black text-white">Today</p>
+                <p className="text-xl font-black text-white">
+                  {stats.formattedLastVisit}
+                </p>
               </div>
             </div>
           </div>
@@ -685,6 +688,7 @@ const OverviewPage: React.FC = () => {
                 <motion.div
                   key={doc.id}
                   whileHover={{ scale: 1.02, x: 5 }}
+                  onClick={() => window.open(`/api/documents/analysis/summary-pdf?document_id=${doc.id}`, "_blank")}
                   className="flex items-center justify-between p-4 bg-white/5 rounded-2xl transition-all border border-transparent hover:border-white/10 cursor-pointer group"
                 >
                   <div className="flex items-center gap-4 min-w-0">
@@ -692,7 +696,7 @@ const OverviewPage: React.FC = () => {
                       <FileText size={22} />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-black truncate max-w-[120px] md:max-w-[180px] text-white">
+                      <p className="text-sm font-black truncate max-w-[120px] md:max-w-[180px] text-white group-hover:text-blue-400 transition-colors">
                         {doc.filename}
                       </p>
                       <p className="text-[11px] text-slate-500 font-bold mt-0.5">
@@ -700,21 +704,33 @@ const OverviewPage: React.FC = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                    <span
-                      className={`text-[9px] font-black px-3 py-1.5 rounded-xl uppercase tracking-widest ${
-                        doc.status === "Completed"
-                          ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                          : "bg-blue-500/10 text-blue-400 border border-blue-500/20"
-                      }`}
-                    >
-                      {doc.status}
-                    </span>
-                    {doc.confidence > 0 && (
-                      <span className="text-[9px] font-black text-slate-500 mr-1">
-                        {doc.confidence}% Match
+                  <div className="flex items-center gap-4 flex-shrink-0">
+                    <div className="flex flex-col items-end gap-1">
+                      <span
+                        className={`text-[9px] font-black px-3 py-1.5 rounded-xl uppercase tracking-widest ${
+                          doc.status === "Completed"
+                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                            : "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                        }`}
+                      >
+                        {doc.status}
                       </span>
-                    )}
+                      {doc.confidence > 0 && (
+                        <span className="text-[9px] font-black text-slate-500 mr-1">
+                          {doc.confidence}% Match
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.open(`/api/documents/analysis/summary-pdf?document_id=${doc.id}`, "_blank");
+                      }}
+                      className="p-2 bg-white/5 hover:bg-blue-500/20 text-slate-400 hover:text-blue-400 rounded-lg transition-all"
+                      title="Export this report's summary"
+                    >
+                      <Download size={16} />
+                    </button>
                   </div>
                 </motion.div>
               ))}

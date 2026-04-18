@@ -71,10 +71,14 @@ async def get_stats(db: Session, patient_id: int = None):
     if completed_docs:
         avg_accuracy = sum([d.confidence_score for d in completed_docs]) / len(completed_docs)
     
+    last_doc = query.order_by(Document.created_at.desc()).first()
+    last_visit = last_doc.created_at.isoformat() if last_doc else None
+    
     return {
         "totalProcessed": total,
         "pendingReview": pending,
-        "accuracyRate": round(avg_accuracy * 100, 1)
+        "accuracyRate": round(avg_accuracy * 100, 1),
+        "lastVisit": last_visit
     }
 
 async def upload_and_process(file: UploadFile, db: Session, user_id: int):
@@ -551,12 +555,15 @@ async def get_medication_schedule(db: Session, patient_id: int = None):
             
     return schedule
 
-async def generate_medical_summary_pdf(db: Session, user_id: int = 1):
+async def generate_medical_summary_pdf(db: Session, user_id: int = 1, document_id: str = None):
     """
     Generates a professional consolidated medical summary PDF.
     """
     # 1. Fetch data & config for branding
-    docs = db.query(Document).filter(Document.status == "completed").order_by(Document.created_at.desc()).all()
+    query = db.query(Document).filter(Document.status == "completed")
+    if document_id:
+        query = query.filter(Document.id == document_id)
+    docs = query.order_by(Document.created_at.desc()).all()
     schedule = await get_medication_schedule(db)
     trends = await get_health_trends(db)
     config = await get_config(db, user_id)

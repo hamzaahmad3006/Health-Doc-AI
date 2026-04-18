@@ -506,44 +506,7 @@ const SettingsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* API Settings */}
-        <div className="glass-card p-8 opacity-60">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="p-3 bg-slate-800 text-slate-500 rounded-2xl">
-              <Shield size={24} />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-white">
-                Security & API Access
-              </h2>
-              <p className="text-sm text-slate-500">
-                Manage your workspace encryption keys (Pro Only)
-              </p>
-            </div>
-          </div>
 
-          <div className="space-y-6">
-            <div className="space-y-2 text-slate-500">
-              <label className="text-sm font-bold">
-                Encrypted Workspace Key
-              </label>
-              <div className="flex gap-4">
-                <input
-                  type="password"
-                  value={settings.api_key}
-                  readOnly
-                  className="flex-1 bg-slate-900/50 border border-slate-800 rounded-2xl py-3.5 px-4 focus:outline-none font-mono text-sm"
-                />
-                <button
-                  disabled
-                  className="px-6 py-3 bg-slate-800 border border-slate-800 rounded-2xl text-sm font-bold cursor-not-allowed"
-                >
-                  Regenerate
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
       </motion.div>
     </div>
   );

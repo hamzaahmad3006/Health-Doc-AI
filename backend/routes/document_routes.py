@@ -72,8 +72,8 @@ async def get_schedule(patient_id: int = None, db: Session = Depends(get_db)):
     return await document_controller.get_medication_schedule(db, patient_id)
 
 @router.get("/analysis/summary-pdf")
-async def get_summary_pdf(db: Session = Depends(get_db)):
-    return await document_controller.generate_medical_summary_pdf(db)
+async def get_summary_pdf(document_id: str = None, db: Session = Depends(get_db)):
+    return await document_controller.generate_medical_summary_pdf(db, document_id=document_id)
 
 @router.get("/analysis/interactions")
 async def get_interactions(db: Session = Depends(get_db)):
